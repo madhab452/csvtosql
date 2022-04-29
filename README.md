@@ -1,7 +1,12 @@
-## madhab452/csvtosql
+# madhab452/csvtosql
 
-csvtosql is cli tool to convert csv file in sql tables,
-Oftentimes we have to work with data in Excel, because Product Owner and users are more comfortable with it. But as an data engineer or developer we feel comfortable to run sql queries.
+csvtosql is a cli tool to convert csv data to sql db tables,
+Oftentimes we have to work with data in Excel because product and users are more comfortable with excel. But, as a data engineer or developer like me feel more comfortable to run sql queries. This will automate your data migration from excel to sql.
 
+#### TODO
 
-
+- [ ] Handle more edge cases, for example when no of cols is greater than header
+- [ ] Add tests
+- [ ] Add mysql as optional db
+- [ ] Remove Util
+- [ ] Add mysql as optional db
