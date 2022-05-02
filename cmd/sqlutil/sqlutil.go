@@ -13,16 +13,14 @@ func ToColumnName(header string) string {
 }
 
 // ToTableName returns a nice name for table.
-// example given ./csvs/BTC-USD-2.csv returns btc_usd_2
+// example given ./csvs/BTC-USD-2.csv returns btc_usd_2.
 // :future-improvements using regex.
 func ToTableName(fname string) string {
 	var res []byte
-	for i, _ := range fname {
+	for i := range fname {
 		ch := fname[i]
 		if ch == '/' { // reset if its a path, not a filename
 			res = []byte{}
-		} else if ch == '.' {
-			break
 		} else {
 			if ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' || ch == '_' {
 				res = append(res, ch)
