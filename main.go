@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -16,6 +15,7 @@ func main() {
 	l := log.Default()
 	opts := &cmd.Option{
 		DBURL: os.Getenv("DBURL"),
+		Fname: "",
 	}
 
 	csvtosql, err := cmd.New(context, l, opts)
@@ -28,5 +28,5 @@ func main() {
 		log.Println("csvtosql.Do():", err)
 	}
 
-	fmt.Println("time taken:", time.Since(start))
+	log.Println("time taken:", time.Since(start))
 }

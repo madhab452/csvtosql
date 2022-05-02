@@ -1,3 +1,4 @@
+// qb provides fluent api to create sql queries
 package qb
 
 import (
@@ -10,20 +11,25 @@ type createTable struct {
 	cols    []string
 }
 
+// CreateTblBuilder ...
 type CreateTblBuilder struct {
 	createTable
 }
 
-// Table name of the table
+// Table name of the table.
 func (ctb *CreateTblBuilder) Table(tblname string) *CreateTblBuilder {
 	ctb.createTable.tblname = tblname
-	return ctb
-}
-func (ctb *CreateTblBuilder) AddCol(col string) *CreateTblBuilder {
-	ctb.createTable.cols = append(ctb.cols, col)
+
 	return ctb
 }
 
+// AddCol add column.
+func (ctb *CreateTblBuilder) AddCol(col string) *CreateTblBuilder {
+	ctb.createTable.cols = append(ctb.createTable.cols, col)
+	return ctb
+}
+
+// ToSql returns sql query.
 func (ct *CreateTblBuilder) ToSql() string {
 	var colspg []string
 
@@ -36,8 +42,12 @@ func (ct *CreateTblBuilder) ToSql() string {
 
 type createTableBuild func(*CreateTblBuilder)
 
+//CreateTbl return builder to create sql query.
 func CreateTbl(action createTableBuild) *CreateTblBuilder {
-	builder := &CreateTblBuilder{}
+	builder := &CreateTblBuilder{
+		createTable: createTable{},
+	}
 	action(builder)
+
 	return builder
 }

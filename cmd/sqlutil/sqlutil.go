@@ -5,22 +5,24 @@ import (
 	"strings"
 )
 
-var Re = regexp.MustCompile(`[^\w]`)
+var re = regexp.MustCompile(`[^\w]`)
 
+// ToColumnName returns a nice name for table column.
 func ToColumnName(header string) string {
-	return toSqlFriendlyName(header)
+	return toSQLFriendlyName(header)
 }
 
+// ToTableName returns a nice name for table
 func ToTableName(fname string) string {
-	return "csvtosql"
 	// return toSqlFriendlyName(fname) // todo: create table name from file
+	return "csvtosql"
 }
 
-func toSqlFriendlyName(str string) string {
+func toSQLFriendlyName(str string) string {
 	str = strings.ToLower(str)
 	str = strings.TrimSpace(str)
 	str = strings.ReplaceAll(str, " ", "_")
+	str = re.ReplaceAllString(str, "")
 
-	str = Re.ReplaceAllString(str, "")
 	return str
 }

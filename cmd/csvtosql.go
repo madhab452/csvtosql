@@ -4,9 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"encoding/csv"
-	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"regexp"
@@ -19,11 +19,14 @@ import (
 
 var filePattern = regexp.MustCompile(".csv$")
 
+// CsvToSql ...
 type CsvToSql struct {
 	Fname string
 	DB    *sql.DB
+	Log   *log.Logger
 }
 
+// Option holds configuration option for command.
 type Option struct {
 	Fname string
 	DBURL string
@@ -45,6 +48,7 @@ func New(ctx context.Context, log *log.Logger, opts *Option) (*CsvToSql, error) 
 
 	return &CsvToSql{
 		Fname: *fname,
+		Log:   log,
 		DB:    db,
 	}, nil
 }
@@ -55,7 +59,7 @@ func (cs *CsvToSql) Do() error {
 	if err != nil {
 		return fmt.Errorf("os.Open(): %w", err)
 	}
-	defer f.Close()
+	defer Close(f, cs.Log)
 
 	csvReader := csv.NewReader(f)
 
@@ -66,7 +70,7 @@ func (cs *CsvToSql) Do() error {
 	}
 
 	if len(records) <= 1 {
-		return errors.New("atleast one record is required")
+		return fmt.Errorf("atleast one record is required")
 	}
 
 	tblname := sqlutil.ToTableName(cs.Fname)
@@ -79,7 +83,7 @@ func (cs *CsvToSql) Do() error {
 	}).ToSql()
 
 	if _, err := cs.DB.Query(createTableQuery); err != nil {
-		return err
+		return fmt.Errorf("cs.DB.Query(createTableQuery): %w", err)
 	}
 
 	insertQuery := qb.Insert(func(qb *qb.InsertBuilder) {
@@ -93,8 +97,15 @@ func (cs *CsvToSql) Do() error {
 	}).ToSql()
 
 	if _, err := cs.DB.Query(insertQuery); err != nil {
-		return err
+		return fmt.Errorf("cs.DB.Query(insertQuery): %w", err)
 	}
 
 	return nil
+}
+
+func Close(r io.Closer, log *log.Logger) {
+	err := r.Close()
+	if err != nil {
+		log.Println(err)
+	}
 }

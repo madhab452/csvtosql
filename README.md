@@ -13,3 +13,5 @@ run `make run `
 - [ ] Handle more edge cases, for example when no of cols is greater than header
 - [ ] Add tests
 - [ ] Add mysql as optional db
+- [ ] Customize linter rule
+	example https://raw.githubusercontent.com/golangci/golangci-lint/master/.golangci.yml
