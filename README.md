@@ -10,6 +10,7 @@ run `make run `
 
 #### TODO
 
+- [ ] Improve speed for large files.
 - [ ] Handle more edge cases, for example when no of cols is greater than header
 - [ ] Add tests
 - [ ] Add mysql as optional db
