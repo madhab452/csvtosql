@@ -4,26 +4,29 @@ import (
 	"context"
 	"database/sql"
 	"encoding/csv"
-	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"regexp"
 
 	_ "github.com/lib/pq"
 
-	"github.com/madhab452/csvtosql/cmd/sqlgen"
-	"github.com/madhab452/csvtosql/cmd/util"
+	"github.com/madhab452/csvtosql/cmd/qb"
+	"github.com/madhab452/csvtosql/cmd/sqlutil"
 )
 
 var filePattern = regexp.MustCompile(".csv$")
 
+// CsvToSql ...
 type CsvToSql struct {
 	Fname string
 	DB    *sql.DB
+	Log   *log.Logger
 }
 
+// Option holds configuration option for command.
 type Option struct {
 	Fname string
 	DBURL string
@@ -45,6 +48,7 @@ func New(ctx context.Context, log *log.Logger, opts *Option) (*CsvToSql, error) 
 
 	return &CsvToSql{
 		Fname: *fname,
+		Log:   log,
 		DB:    db,
 	}, nil
 }
@@ -55,7 +59,7 @@ func (cs *CsvToSql) Do() error {
 	if err != nil {
 		return fmt.Errorf("os.Open(): %w", err)
 	}
-	defer f.Close()
+	defer Close(f, cs.Log)
 
 	csvReader := csv.NewReader(f)
 
@@ -66,21 +70,42 @@ func (cs *CsvToSql) Do() error {
 	}
 
 	if len(records) <= 1 {
-		return errors.New("len(records): csv file must have at least one record to insert")
+		return fmt.Errorf("atleast one record is required")
 	}
-	sqlgen := sqlgen.New(&records)
-	tblName := util.ToTableName(cs.Fname)
 
-	createTableQuery := sqlgen.CreateTblQuery(tblName)
+	tblname := sqlutil.ToTableName(cs.Fname)
+
+	createTableQuery := qb.CreateTbl(func(qb *qb.CreateTblBuilder) {
+		qb.Table(tblname)
+		for _, col := range records[0] {
+			qb.AddCol(sqlutil.ToColumnName(col))
+		}
+	}).ToSql()
 
 	if _, err := cs.DB.Query(createTableQuery); err != nil {
-		return err
+		return fmt.Errorf("cs.DB.Query(createTableQuery): %w", err)
 	}
 
-	insertQuery := sqlgen.InsertQuery(tblName)
+	insertQuery := qb.Insert(func(qb *qb.InsertBuilder) {
+		qb.Table(tblname)
+		for _, col := range records[0] {
+			qb.AddCol(sqlutil.ToColumnName(col))
+		}
+		for _, row := range records[1:] {
+			qb.AddRow(row)
+		}
+	}).ToSql()
+
 	if _, err := cs.DB.Query(insertQuery); err != nil {
-		return err
+		return fmt.Errorf("cs.DB.Query(insertQuery): %w", err)
 	}
 
 	return nil
+}
+
+func Close(r io.Closer, log *log.Logger) {
+	err := r.Close()
+	if err != nil {
+		log.Println(err)
+	}
 }
