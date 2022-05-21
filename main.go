@@ -25,7 +25,7 @@ func main() {
 	}
 
 	if err := csvtosql.Exec(); err != nil {
-		log.Println("csvtosql.Do():", err)
+		log.Println("csvtosql.Exec():", err)
 	}
 
 	log.Println("time taken:", time.Since(start))
