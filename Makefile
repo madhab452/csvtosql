@@ -11,7 +11,11 @@ help: ## Show command list
 
 run: ## Run command
 	. ./.env.sh; \
-	go run main.go -fname=./csvs/BTC-USD-2.csv
+	go run main.go -fname=./_examples/BTC-USD-2.csv
+
+run2: ## Run (large files with a lots of data)
+	. ./.env.sh; \
+	go run main.go -fname=./_examples/BTC-USD-LARGE.csv
 	
 test: ## Run Tests
 	. ./.env.sh
