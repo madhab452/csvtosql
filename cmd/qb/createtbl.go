@@ -38,6 +38,7 @@ func (ct *CreateTblBuilder) ToSql() string {
 	}
 
 	sql := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (%s);`, ct.tblname, strings.Join(colspg, ", "))
+	
 	return sql
 }
 
