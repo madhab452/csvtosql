@@ -34,10 +34,11 @@ func (ct *CreateTblBuilder) ToSql() string {
 	var colspg []string
 
 	for _, col := range ct.cols {
-		colspg = append(colspg, fmt.Sprintf("\t%s VARCHAR(255)", col))
+		colspg = append(colspg, fmt.Sprintf("%s VARCHAR(255)", col))
 	}
 
-	return fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (%s);`, ct.tblname, strings.Join(colspg, ","))
+	sql := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (%s);`, ct.tblname, strings.Join(colspg, ", "))
+	return sql
 }
 
 type createTableBuild func(*CreateTblBuilder)

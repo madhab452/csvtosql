@@ -39,13 +39,17 @@ func (cib *InsertBuilder) AddRow(row []string) *InsertBuilder {
 
 // ToSql converts the QueryBuilder to sql query.
 func (cib *InsertBuilder) ToSql() string {
-	var rowspg []string
-
-	for _, row := range cib.rows {
-		rowspg = append(rowspg, strings.Join(row, "','"))
+	var pgrows []string
+	for i, row := range cib.rows {
+		for j, v := range row {
+			cib.rows[i][j] = fmt.Sprintf("'%s'", v)
+		}
+		pgrow := strings.Join(cib.rows[i], ",")
+		pgrowwrapped := fmt.Sprintf("(%s)", pgrow)
+		pgrows = append(pgrows, pgrowwrapped)
 	}
 
-	return fmt.Sprintf("INSERT INTO %s (%s) VALUES ('%s');", cib.tblname, strings.Join(cib.cols, ","), strings.Join(rowspg, "'),('"))
+	return fmt.Sprintf("INSERT INTO %s (%s) VALUES %s;", cib.tblname, strings.Join(cib.cols, ", "), strings.Join(pgrows, ", "))
 }
 
 type insertBuild func(*InsertBuilder)
