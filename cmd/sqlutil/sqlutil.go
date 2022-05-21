@@ -9,7 +9,7 @@ import (
 // Characters not in the given list
 var re = regexp.MustCompile(`[^a-zA-Z0-9\_]`)
 
-func remove(str string) string {
+func rmeoveNextUnderscore(str string) string {
 	var sb strings.Builder
 	// replace multiple _ with single _. given
 	sb.WriteByte(str[0])
@@ -37,7 +37,7 @@ func ToColumnName(header string) string {
 		return mutheader
 	}
 
-	return remove(mutheader)
+	return rmeoveNextUnderscore(mutheader)
 }
 
 // ToTableName returns a nice name for table.
@@ -63,7 +63,7 @@ func ToTableName(fname string) string {
 	}
 
 	str = strings.ToLower(str)
-	str = remove(str)
+	str = rmeoveNextUnderscore(str)
 
 	return str
 }
