@@ -53,8 +53,8 @@ func New(ctx context.Context, log *log.Logger, opts *Option) (*CsvToSql, error) 
 	}, nil
 }
 
-// Do validates csv data, prepare sql query and runs query against specified db
-func (cs *CsvToSql) Do() error {
+// Exec validates csv data, prepare sql query and runs query against specified db
+func (cs *CsvToSql) Exec() error {
 	f, err := os.Open(cs.Fname)
 	if err != nil {
 		return fmt.Errorf("os.Open(): %w", err)
@@ -64,11 +64,9 @@ func (cs *CsvToSql) Do() error {
 	csvReader := csv.NewReader(f)
 
 	records, err := csvReader.ReadAll()
-
 	if err != nil {
 		return fmt.Errorf("csvReader.ReadAll(): %w", err)
 	}
-
 	if len(records) <= 1 {
 		return fmt.Errorf("atleast one record is required")
 	}

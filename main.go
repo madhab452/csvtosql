@@ -24,7 +24,7 @@ func main() {
 		log.Println("cmd.New():", err)
 	}
 
-	if err := csvtosql.Do(); err != nil {
+	if err := csvtosql.Exec(); err != nil {
 		log.Println("csvtosql.Do():", err)
 	}
 

@@ -13,3 +13,6 @@ run: ## Run command
 	. ./.env.sh; \
 	go run main.go -fname=./csvs/BTC-USD-2.csv
 	
+test: ## Run Tests
+	. ./.env.sh
+	go test ./...
