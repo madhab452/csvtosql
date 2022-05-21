@@ -64,7 +64,7 @@ func (cs *CsvToSql) Exec() error {
 	csvReader := csv.NewReader(f)
 
 	records, err := csvReader.ReadAll()
-	if err != nil {
+	if err != nil { // errors like wrong number if fields in csv
 		return fmt.Errorf("csvReader.ReadAll(): %w", err)
 	}
 	if len(records) <= 1 {
@@ -80,12 +80,9 @@ func (cs *CsvToSql) Exec() error {
 		}
 	}).ToSql()
 
-	if _, err := cs.DB.Query(createTableQuery); err != nil {
-		return fmt.Errorf("cs.DB.Query(createTableQuery): %w", err)
-	}
-
 	insertQuery := qb.Insert(func(qb *qb.InsertBuilder) {
 		qb.Table(tblname)
+
 		for _, col := range records[0] {
 			qb.AddCol(sqlutil.ToColumnName(col))
 		}
@@ -93,6 +90,10 @@ func (cs *CsvToSql) Exec() error {
 			qb.AddRow(row)
 		}
 	}).ToSql()
+
+	if _, err := cs.DB.Query(createTableQuery); err != nil {
+		return fmt.Errorf("cs.DB.Query(createTableQuery): %w", err)
+	}
 
 	if _, err := cs.DB.Query(insertQuery); err != nil {
 		return fmt.Errorf("cs.DB.Query(insertQuery): %w", err)
