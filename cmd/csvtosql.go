@@ -87,7 +87,6 @@ func (cs *CsvToSql) Exec() error {
 		return fmt.Errorf("cs.DB.Query(createTableQuery): %w", err)
 	}
 
-	// TODO: run these in seperate go routene
 	for i, chunk := range chunks {
 		insertQuery := qb.Insert(func(qb *qb.InsertBuilder) {
 			qb.Table(tblname)
