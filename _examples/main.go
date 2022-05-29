@@ -1,4 +1,4 @@
-// Write 1 million records into BTC-USD-LARGE.csv with sample data
+// Write records into BTC-USD-LARGE.csv with sample data
 package main
 
 import (
@@ -7,7 +7,7 @@ import (
 )
 
 const FILE = "./BTC-USD-LARGE.csv"
-const TOTAL = 1000000 * 10
+const TOTAL = 1000000 * 1 // 1 million
 
 func main() {
 	if _, err := os.Stat(FILE); err == nil {

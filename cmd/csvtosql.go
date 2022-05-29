@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"database/sql"
-	"encoding/csv"
 	"flag"
 	"fmt"
 	"io"
@@ -14,6 +13,7 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/madhab452/csvtosql/cmd/qb"
+	"github.com/madhab452/csvtosql/cmd/reader"
 	"github.com/madhab452/csvtosql/cmd/sqlutil"
 )
 
@@ -61,13 +61,16 @@ func (cs *CsvToSql) Exec() error {
 	}
 	defer Close(f, cs.Log)
 
-	csvReader := csv.NewReader(f)
-
-	records, err := csvReader.ReadAll()
-	if err != nil { // errors like wrong number if fields in csv
-		return fmt.Errorf("csvReader.ReadAll(): %w", err)
+	reader := reader.NewReader(f)
+	headers, chunks, err := reader.ReadChunks(10000)
+	if err != nil {
+		return fmt.Errorf("reader.ReadChunks(): %w", err)
 	}
-	if len(records) <= 1 {
+	if headers == nil {
+		return fmt.Errorf("empty file")
+	}
+
+	if len(chunks[0]) <= 1 {
 		return fmt.Errorf("atleast one record is required")
 	}
 
@@ -75,19 +78,8 @@ func (cs *CsvToSql) Exec() error {
 
 	createTableQuery := qb.CreateTbl(func(qb *qb.CreateTblBuilder) {
 		qb.Table(tblname)
-		for _, col := range records[0] {
+		for _, col := range headers {
 			qb.AddCol(sqlutil.ToColumnName(col))
-		}
-	}).ToSql()
-
-	insertQuery := qb.Insert(func(qb *qb.InsertBuilder) {
-		qb.Table(tblname)
-
-		for _, col := range records[0] {
-			qb.AddCol(sqlutil.ToColumnName(col))
-		}
-		for _, row := range records[1:] {
-			qb.AddRow(row)
 		}
 	}).ToSql()
 
@@ -95,8 +87,24 @@ func (cs *CsvToSql) Exec() error {
 		return fmt.Errorf("cs.DB.Query(createTableQuery): %w", err)
 	}
 
-	if _, err := cs.DB.Query(insertQuery); err != nil {
-		return fmt.Errorf("cs.DB.Query(insertQuery): %w", err)
+	// TODO: run these in seperate go routene
+	for i, chunk := range chunks {
+		insertQuery := qb.Insert(func(qb *qb.InsertBuilder) {
+			qb.Table(tblname)
+			for _, col := range headers {
+				qb.AddCol(sqlutil.ToColumnName(col))
+			}
+			for _, row := range chunk { //remove header
+				qb.AddRow(row)
+			}
+		}).ToSql()
+
+		rows, err := cs.DB.Query(insertQuery)
+		if err != nil {
+			return fmt.Errorf("cs.DB.Query(insertQuery): %w", err)
+		}
+		Close(rows, cs.Log)
+		fmt.Printf("%v records inserted \n", (i+1)*len(chunk))
 	}
 
 	return nil

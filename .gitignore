@@ -1,9 +1,5 @@
 .vscode
 .env.sh
 
-<<<<<<< HEAD
 _examples/BTC-USD-LARGE.csv
 .DS_Store
-=======
-_examples/BTC-USD-LARGE.csv
->>>>>>> main
