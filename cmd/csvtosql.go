@@ -93,7 +93,7 @@ func (cs *CsvToSql) Exec() error {
 			for _, col := range headers {
 				qb.AddCol(sqlutil.ToColumnName(col))
 			}
-			for _, row := range chunk { //remove header
+			for _, row := range chunk {
 				qb.AddRow(row)
 			}
 		}).ToSql()
