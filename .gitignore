@@ -2,3 +2,4 @@
 .env.sh
 
 _examples/BTC-USD-LARGE.csv
+.DS_Store

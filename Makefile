@@ -13,10 +13,14 @@ run: ## Run command
 	. ./.env.sh; \
 	go run main.go -fname=./_examples/BTC-USD-2.csv
 
-run2: ## Run (large files with a lots of data)
+run_large: ## Run (large files with a lots of data)
 	. ./.env.sh; \
 	go run main.go -fname=./_examples/BTC-USD-LARGE.csv
-	
+
+gen_large: ## Generate large file with a log of data.
+	cd _examples && go run main.go
+
 test: ## Run Tests
 	. ./.env.sh
 	go test ./...
+
