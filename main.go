@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -15,17 +16,19 @@ func main() {
 	l := log.Default()
 	opts := &cmd.Option{
 		DBURL: os.Getenv("DBURL"),
-		Fname: "",
+		Fpath: "",
 	}
 
 	csvtosql, err := cmd.New(context, l, opts)
 
 	if err != nil {
-		log.Println("cmd.New():", err)
+		fmt.Printf("cmd.New(): %v \n", err)
+		return
 	}
 
 	if err := csvtosql.Exec(); err != nil {
-		log.Println("csvtosql.Exec():", err)
+		fmt.Printf("csvtosql.Exec(): %v", err)
+		return
 	}
 
 	log.Println("time taken:", time.Since(start))

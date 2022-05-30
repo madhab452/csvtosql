@@ -21,23 +21,27 @@ var filePattern = regexp.MustCompile(".csv$")
 
 // CsvToSql ...
 type CsvToSql struct {
-	Fname string
+	Fpath string
 	DB    *sql.DB
 	Log   *log.Logger
 }
 
 // Option holds configuration option for command.
 type Option struct {
-	Fname string
+	Fpath string
 	DBURL string
 }
 
 // New Creates an instance of CsvToSql
 func New(ctx context.Context, log *log.Logger, opts *Option) (*CsvToSql, error) {
-	fname := flag.String("fname", "", "csv file")
+	fpath := flag.String("f", "", "csv file")
 	flag.Parse()
 
-	if !filePattern.MatchString(*fname) {
+	if *fpath == "" {
+		return nil, fmt.Errorf("-f argument is required")
+	}
+
+	if !filePattern.MatchString(*fpath) {
 		return nil, fmt.Errorf("invalid filename, expected csv file")
 	}
 
@@ -47,7 +51,7 @@ func New(ctx context.Context, log *log.Logger, opts *Option) (*CsvToSql, error) 
 	}
 
 	return &CsvToSql{
-		Fname: *fname,
+		Fpath: *fpath,
 		Log:   log,
 		DB:    db,
 	}, nil
@@ -55,7 +59,7 @@ func New(ctx context.Context, log *log.Logger, opts *Option) (*CsvToSql, error) 
 
 // Exec validates csv data, prepare sql query and runs query against specified db
 func (cs *CsvToSql) Exec() error {
-	f, err := os.Open(cs.Fname)
+	f, err := os.Open(cs.Fpath)
 	if err != nil {
 		return fmt.Errorf("os.Open(): %w", err)
 	}
@@ -74,7 +78,7 @@ func (cs *CsvToSql) Exec() error {
 		return fmt.Errorf("atleast one record is required")
 	}
 
-	tblname := sqlutil.ToTableName(cs.Fname)
+	tblname := sqlutil.ToTableName(cs.Fpath)
 
 	createTableQuery := qb.CreateTbl(func(qb *qb.CreateTblBuilder) {
 		qb.Table(tblname)

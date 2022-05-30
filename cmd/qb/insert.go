@@ -17,39 +17,39 @@ type InsertBuilder struct {
 }
 
 // Table name of the table.
-func (cib *InsertBuilder) Table(tblname string) *InsertBuilder {
-	cib.insert.tblname = tblname
+func (ib *InsertBuilder) Table(tblname string) *InsertBuilder {
+	ib.insert.tblname = tblname
 
-	return cib
+	return ib
 }
 
 // AddCols add cols.
-func (cib *InsertBuilder) AddCol(colname string) *InsertBuilder {
-	cib.insert.cols = append(cib.insert.cols, colname)
+func (ib *InsertBuilder) AddCol(colname string) *InsertBuilder {
+	ib.insert.cols = append(ib.insert.cols, colname)
 
-	return cib
+	return ib
 }
 
 // AddRow adds row.
-func (cib *InsertBuilder) AddRow(row []string) *InsertBuilder {
-	cib.insert.rows = append(cib.insert.rows, row)
+func (ib *InsertBuilder) AddRow(row []string) *InsertBuilder {
+	ib.insert.rows = append(ib.insert.rows, row)
 
-	return cib
+	return ib
 }
 
 // ToSql converts the QueryBuilder to sql query.
-func (cib *InsertBuilder) ToSql() string {
+func (ib *InsertBuilder) ToSql() string {
 	var pgrows []string
-	for i, row := range cib.rows {
+	for i, row := range ib.rows {
 		for j, v := range row {
-			cib.rows[i][j] = fmt.Sprintf("'%s'", v)
+			ib.rows[i][j] = fmt.Sprintf("'%s'", v)
 		}
-		pgrow := strings.Join(cib.rows[i], ",")
+		pgrow := strings.Join(ib.rows[i], ",")
 		pgrowwrapped := fmt.Sprintf("(%s)", pgrow)
 		pgrows = append(pgrows, pgrowwrapped)
 	}
 
-	return fmt.Sprintf("INSERT INTO %s (%s) VALUES %s;", cib.tblname, strings.Join(cib.cols, ", "), strings.Join(pgrows, ", "))
+	return fmt.Sprintf("INSERT INTO %s (%s) VALUES %s;", ib.tblname, strings.Join(ib.cols, ", "), strings.Join(pgrows, ", "))
 }
 
 type insertBuild func(*InsertBuilder)

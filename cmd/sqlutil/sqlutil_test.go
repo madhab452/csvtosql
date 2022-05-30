@@ -44,7 +44,7 @@ func TestToColumnName(t *testing.T) {
 			want:        "unknown_2",
 		},
 		{
-			description: "lots of unique characters",
+			description: "special characters",
 			wantError:   nil,
 			given:       "test*** ___'''***'''special  col",
 			want:        "test_special_col",
