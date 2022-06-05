@@ -11,7 +11,7 @@ type createTable struct {
 	cols    []string
 }
 
-// CreateTblBuilder ...
+// CreateTblBuilder CreateTblBuilder
 type CreateTblBuilder struct {
 	createTable
 }
@@ -29,22 +29,22 @@ func (ctb *CreateTblBuilder) AddCol(col string) *CreateTblBuilder {
 	return ctb
 }
 
-// ToSql returns sql query.
-func (ct *CreateTblBuilder) ToSql() string {
+// ToSQL returns sql query.
+func (ctb *CreateTblBuilder) ToSQL() string {
 	var colspg []string
 
-	for _, col := range ct.cols {
+	for _, col := range ctb.cols {
 		colspg = append(colspg, fmt.Sprintf("%s VARCHAR(255)", col))
 	}
 
-	sql := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (%s);`, ct.tblname, strings.Join(colspg, ", "))
-	
+	sql := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (%s);`, ctb.tblname, strings.Join(colspg, ", "))
+
 	return sql
 }
 
 type createTableBuild func(*CreateTblBuilder)
 
-//CreateTbl return builder to create sql query.
+// CreateTbl return builder to create sql query.
 func CreateTbl(action createTableBuild) *CreateTblBuilder {
 	builder := &CreateTblBuilder{
 		createTable: createTable{},

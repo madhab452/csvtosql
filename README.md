@@ -8,9 +8,5 @@ Oftentimes we have to work with data in Excel because product owner and users ar
 Clone/Fork the repo, rename .env.sh.example to .env.sh and ajust environment variable to your machine.
 run `make run `
 
-#### TODO
-
-- [ ] Improve speed for large files.
+### TODO
 - [ ] Add mysql as optional db
-- [ ] Customize linter rule
-	example https://raw.githubusercontent.com/golangci/golangci-lint/master/.golangci.yml

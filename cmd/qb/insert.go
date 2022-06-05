@@ -23,7 +23,7 @@ func (ib *InsertBuilder) Table(tblname string) *InsertBuilder {
 	return ib
 }
 
-// AddCols add cols.
+// AddCol add column.
 func (ib *InsertBuilder) AddCol(colname string) *InsertBuilder {
 	ib.insert.cols = append(ib.insert.cols, colname)
 
@@ -37,8 +37,8 @@ func (ib *InsertBuilder) AddRow(row []string) *InsertBuilder {
 	return ib
 }
 
-// ToSql converts the QueryBuilder to sql query.
-func (ib *InsertBuilder) ToSql() string {
+// ToSQL converts the QueryBuilder to sql query.
+func (ib *InsertBuilder) ToSQL() string {
 	var pgrows []string
 	for i, row := range ib.rows {
 		for j, v := range row {

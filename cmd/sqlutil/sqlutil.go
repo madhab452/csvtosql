@@ -28,9 +28,8 @@ var ucounter int
 // ToColumnName returns a nice name for table column.
 func ToColumnName(header string) string {
 	if header == "" {
-		ucounter = ucounter + 1
+		ucounter++
 		return "unknown_" + strconv.Itoa(ucounter)
-
 	}
 	mutheader := re.ReplaceAllString(header, "_")
 	if len(mutheader) == 1 {
@@ -58,7 +57,7 @@ func ToTableName(fname string) string {
 	}
 	str := string(res)
 
-	if str[len(str)-4:] == "_csv" { // remove extention
+	if str[len(str)-4:] == "_csv" { // remove extension
 		str = str[0 : len(str)-4]
 	}
 

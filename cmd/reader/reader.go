@@ -7,6 +7,7 @@ import (
 
 type chunk [][]string
 
+// Reader represents reader.
 type Reader struct {
 	f  *os.File
 	cr *csv.Reader

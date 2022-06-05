@@ -3,23 +3,28 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/madhab452/csvtosql/cmd"
 )
 
+var log *logrus.Entry
+
 func main() {
+	log = logrus.NewEntry(logrus.New())
+
 	start := time.Now()
-	context := context.Background()
-	l := log.Default()
+	ctx := context.Background()
+
 	opts := &cmd.Option{
 		DBURL: os.Getenv("DBURL"),
 		Fpath: "",
 	}
 
-	csvtosql, err := cmd.New(context, l, opts)
+	csvtosql, err := cmd.New(ctx, log, opts)
 
 	if err != nil {
 		fmt.Printf("cmd.New(): %v \n", err)
