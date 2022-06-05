@@ -35,7 +35,7 @@ func TestInsert(t *testing.T) {
 				for _, val := range tt.vals {
 					qb.AddRow(val)
 				}
-			}).ToSql()
+			}).ToSQL()
 
 			if createTblQuery != tt.want {
 				t.Errorf("unexpected, got %v, want %v", createTblQuery, tt.want)

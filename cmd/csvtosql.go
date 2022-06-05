@@ -6,11 +6,11 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"regexp"
 
 	_ "github.com/lib/pq"
+	"github.com/sirupsen/logrus"
 
 	"github.com/madhab452/csvtosql/cmd/qb"
 	"github.com/madhab452/csvtosql/cmd/reader"
@@ -19,11 +19,11 @@ import (
 
 var filePattern = regexp.MustCompile(".csv$")
 
-// CsvToSql ...
-type CsvToSql struct {
+// Cts means csv to sql
+type Cts struct {
 	Fpath string
 	DB    *sql.DB
-	Log   *log.Logger
+	Log   *logrus.Entry
 }
 
 // Option holds configuration option for command.
@@ -33,7 +33,7 @@ type Option struct {
 }
 
 // New Creates an instance of CsvToSql
-func New(ctx context.Context, log *log.Logger, opts *Option) (*CsvToSql, error) {
+func New(ctx context.Context, log *logrus.Entry, opts *Option) (*Cts, error) {
 	fpath := flag.String("f", "", "csv file")
 	flag.Parse()
 
@@ -50,7 +50,7 @@ func New(ctx context.Context, log *log.Logger, opts *Option) (*CsvToSql, error) 
 		return nil, fmt.Errorf("sql.Open(): %w", err)
 	}
 
-	return &CsvToSql{
+	return &Cts{
 		Fpath: *fpath,
 		Log:   log,
 		DB:    db,
@@ -58,15 +58,15 @@ func New(ctx context.Context, log *log.Logger, opts *Option) (*CsvToSql, error) 
 }
 
 // Exec validates csv data, prepare sql query and runs query against specified db
-func (cs *CsvToSql) Exec() error {
+func (cs *Cts) Exec() error {
 	f, err := os.Open(cs.Fpath)
 	if err != nil {
 		return fmt.Errorf("os.Open(): %w", err)
 	}
 	defer Close(f, cs.Log)
 
-	reader := reader.NewReader(f)
-	headers, chunks, err := reader.ReadChunks(10000)
+	r := reader.NewReader(f)
+	headers, chunks, err := r.ReadChunks(10000)
 	if err != nil {
 		return fmt.Errorf("reader.ReadChunks(): %w", err)
 	}
@@ -85,8 +85,9 @@ func (cs *CsvToSql) Exec() error {
 		for _, col := range headers {
 			qb.AddCol(sqlutil.ToColumnName(col))
 		}
-	}).ToSql()
+	}).ToSQL()
 
+	//nolint: gocritic
 	if _, err := cs.DB.Query(createTableQuery); err != nil {
 		return fmt.Errorf("cs.DB.Query(createTableQuery): %w", err)
 	}
@@ -100,7 +101,7 @@ func (cs *CsvToSql) Exec() error {
 			for _, row := range chunk {
 				qb.AddRow(row)
 			}
-		}).ToSql()
+		}).ToSQL()
 
 		rows, err := cs.DB.Query(insertQuery)
 		if err != nil {
@@ -113,9 +114,10 @@ func (cs *CsvToSql) Exec() error {
 	return nil
 }
 
-func Close(r io.Closer, log *log.Logger) {
+// Close close anything that implements io.Closer
+func Close(r io.Closer, log *logrus.Entry) {
 	err := r.Close()
 	if err != nil {
-		log.Println(err)
+		log.WithError(err).Printf("r.Close()")
 	}
 }

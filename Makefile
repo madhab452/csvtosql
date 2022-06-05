@@ -24,3 +24,5 @@ test: ## Run Tests
 	. ./.env.sh
 	go test ./...
 
+lint: ## Run linter
+	golangci-lint run

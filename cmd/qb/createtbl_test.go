@@ -30,7 +30,7 @@ func TestCreateTbl(t *testing.T) {
 				for _, col := range tt.cols {
 					qb.AddCol(col)
 				}
-			}).ToSql()
+			}).ToSQL()
 
 			if createTblQuery != tt.want {
 				t.Errorf("unexpected, got %v, want %v", createTblQuery, tt.want)
