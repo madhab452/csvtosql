@@ -26,26 +26,48 @@ type Cts struct {
 	Log   *logrus.Entry
 }
 
-// Option holds configuration option for command.
-type Option struct {
-	Fpath string
-	DBURL string
-}
-
 // New Creates an instance of CsvToSql
-func New(ctx context.Context, log *logrus.Entry, opts *Option) (*Cts, error) {
-	fpath := flag.String("f", "", "csv file")
+func New(ctx context.Context, log *logrus.Entry) (*Cts, error) {
+	fpath := flag.String("f", "", "Csv file to import. (Required)")
+	database := flag.String("db", "postgres", "Database {postgres|mysql|elastic}.")
+	dbURL := flag.String("dburl", "", "Db connection url")
+
+	help := flag.Bool("help", false, "")
 	flag.Parse()
 
+	if *help {
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+
 	if *fpath == "" {
-		return nil, fmt.Errorf("-f argument is required")
+		fmt.Println("missing required arguments -f")
+		fmt.Println("Usase: ")
+		flag.PrintDefaults()
+		os.Exit(2)
+	}
+
+	if *database != "" {
+		if ok := map[string]bool{"postgres": true, "mysql": true, "elastic": true}[*database]; !ok {
+			fmt.Println("invalid database")
+			fmt.Println("Usase: ")
+			flag.PrintDefaults()
+			os.Exit(2)
+		}
+	}
+
+	if *dbURL == "" {
+		fmt.Printf("missing db connection url.")
+		fmt.Println("Usase: ")
+		flag.PrintDefaults()
+		os.Exit(2)
 	}
 
 	if !filePattern.MatchString(*fpath) {
 		return nil, fmt.Errorf("invalid filename, expected csv file")
 	}
 
-	db, err := sql.Open("postgres", opts.DBURL)
+	db, err := sql.Open("postgres", *dbURL)
 	if err != nil {
 		return nil, fmt.Errorf("sql.Open(): %w", err)
 	}
@@ -63,7 +85,7 @@ func (cs *Cts) Exec() error {
 	if err != nil {
 		return fmt.Errorf("os.Open(): %w", err)
 	}
-	defer Close(f, cs.Log)
+	defer close(f, cs.Log)
 
 	r := reader.NewReader(f)
 	headers, chunks, err := r.ReadChunks(10000)
@@ -107,15 +129,15 @@ func (cs *Cts) Exec() error {
 		if err != nil {
 			return fmt.Errorf("cs.DB.Query(insertQuery): %w", err)
 		}
-		Close(rows, cs.Log)
+		close(rows, cs.Log)
 		fmt.Printf("%v records inserted \n", (i+1)*len(chunk))
 	}
 
 	return nil
 }
 
-// Close close anything that implements io.Closer
-func Close(r io.Closer, log *logrus.Entry) {
+// close close anything that implements io.Closer
+func close(r io.Closer, log *logrus.Entry) {
 	err := r.Close()
 	if err != nil {
 		log.WithError(err).Printf("r.Close()")
