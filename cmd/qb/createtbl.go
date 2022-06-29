@@ -1,4 +1,4 @@
-// qb provides fluent api to create sql queries
+// Package qb provides fluent api to create sql queries
 package qb
 
 import (

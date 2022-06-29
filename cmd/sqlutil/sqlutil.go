@@ -1,3 +1,4 @@
+// Package sqlutil has some helper function for sql.
 package sqlutil
 
 import (

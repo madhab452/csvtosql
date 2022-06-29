@@ -85,7 +85,7 @@ func (cs *Cts) Exec() error {
 	if err != nil {
 		return fmt.Errorf("os.Open(): %w", err)
 	}
-	defer close(f, cs.Log)
+	defer closeit(f, cs.Log)
 
 	r := reader.NewReader(f)
 	headers, chunks, err := r.ReadChunks(10000)
@@ -129,15 +129,15 @@ func (cs *Cts) Exec() error {
 		if err != nil {
 			return fmt.Errorf("cs.DB.Query(insertQuery): %w", err)
 		}
-		close(rows, cs.Log)
+		closeit(rows, cs.Log)
 		fmt.Printf("%v records inserted \n", (i+1)*len(chunk))
 	}
 
 	return nil
 }
 
-// close close anything that implements io.Closer
-func close(r io.Closer, log *logrus.Entry) {
+// closeit closeit anything that implements io.Closer
+func closeit(r io.Closer, log *logrus.Entry) {
 	err := r.Close()
 	if err != nil {
 		log.WithError(err).Printf("r.Close()")
