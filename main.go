@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -19,12 +18,7 @@ func main() {
 	start := time.Now()
 	ctx := context.Background()
 
-	opts := &cmd.Option{
-		DBURL: os.Getenv("DBURL"),
-		Fpath: "",
-	}
-
-	csvtosql, err := cmd.New(ctx, log, opts)
+	csvtosql, err := cmd.New(ctx, log)
 
 	if err != nil {
 		fmt.Printf("cmd.New(): %v \n", err)

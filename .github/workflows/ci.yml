@@ -1,5 +1,4 @@
 name: Golang CI Quality Check
-
 on:
   push:
     branches: [main]
