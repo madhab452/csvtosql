@@ -5,3 +5,5 @@ _examples/BTC-USD-LARGE.csv
 .DS_Store
 build/
 dist/
+
+dist/
