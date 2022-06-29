@@ -25,3 +25,4 @@ lint: ## Run linter
 	golangci-lint run
 
 release: ## Generate compiled binaries for different os.
+	goreleaser 
