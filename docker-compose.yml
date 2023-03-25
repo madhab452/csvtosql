@@ -1,0 +1,15 @@
+version: "3"
+services:
+  csvtosql-postgres:
+    container_name: csvtosql-postgres
+    image: postgres:14.2
+    ports:
+      - '5440:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - db:/var/lib/postgresql/data
+volumes:
+  db:
+    driver: local
