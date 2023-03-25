@@ -30,7 +30,7 @@ type Cts struct {
 func New(ctx context.Context, log *logrus.Entry) (*Cts, error) {
 	fpath := flag.String("f", "", "Csv file to import. (Required)")
 	database := flag.String("db", "postgres", "Database {postgres|mysql|elastic}.")
-	dbURL := flag.String("dburl", "", "Db connection url")
+	dbURL := flag.String("DBURL", "", "Db connection url")
 
 	help := flag.Bool("help", false, "")
 	flag.Parse()
