@@ -26,6 +26,7 @@ func (ctb *CreateTblBuilder) Table(tblname string) *CreateTblBuilder {
 // AddCol add column.
 func (ctb *CreateTblBuilder) AddCol(col string) *CreateTblBuilder {
 	ctb.createTable.cols = append(ctb.createTable.cols, col)
+
 	return ctb
 }
 

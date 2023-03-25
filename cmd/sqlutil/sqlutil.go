@@ -26,13 +26,22 @@ func rmeoveNextUnderscore(str string) string {
 
 var ucounter int
 
+func removeSpecialChars(s string) string {
+	return strings.ReplaceAll(s, "'", "")
+}
+
 // ToColumnName returns a nice name for table column.
-func ToColumnName(header string) string {
-	if header == "" {
+func ToColumnName(h string) string {
+	_, after, ok := strings.Cut(h, "=>")
+	if ok {
+		return removeSpecialChars(after)
+	}
+
+	if h == "" {
 		ucounter++
 		return "unknown_" + strconv.Itoa(ucounter)
 	}
-	mutheader := re.ReplaceAllString(header, "_")
+	mutheader := re.ReplaceAllString(h, "_")
 	if len(mutheader) == 1 {
 		return mutheader
 	}
